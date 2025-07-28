@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>随机老虎机</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(to bottom, #1a1a2e, #16213e);
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            font-size: 2.5em;
+            text-shadow: 0 0 10px #00ffcc;
+            margin-bottom: 20px;
+        }
+        .slot-machine {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            background: #0f0f1a;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
+        }
+        .slot {
+            background: #222;
+            border: 2px solid #00ffcc;
+            border-radius: 8px;
+            padding: 15px;
+            width: 120px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .slot label {
+            font-size: 1.1em;
+            color: #00ffcc;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .slot span {
+            font-size: 1em;
+            background: #333;
+            padding: 10px;
+            border-radius: 5px;
+            display: block;
+            color: #fff;
+            min-height: 40px;
+        }
+        .slot.spinning span {
+            animation: spin 0.1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-20px); }
+        }
+        button {
+            margin-top: 20px;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            background: linear-gradient(45deg, #ff0066, #ffcc00);
+            color: #fff;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(255, 0, 102, 0.7);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 0, 102, 1);
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 1.1em;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 600px;
+        }
+        @media (max-width: 600px) {
+            .slot { width: 100px; }
+            .slot span { font-size: 0.9em; }
+            button { font-size: 1em; padding: 10px 20px; }
+        }
+    </style>
+</head>
+<body>
+    <h1>随机老虎机</h1>
+    <div class="slot-machine">
+        <div class="slot" id="slot-map"><label>地图</label><span id="map">封锁农场</span></div>
+        <div class="slot" id="slot-weapon"><label>武器</label><span id="weapon">M24</span></div>
+        <div class="slot" id="slot-bullet"><label>子弹</label><span id="bullet">1级子弹</span></div>
+        <div class="slot" id="slot-money"><label>配装金额</label><span id="money">50万</span></div>
+        <div class="slot" id="slot-task"><label>任务</label><span id="task">击杀真人1人</span></div>
+    </div>
+    <button onclick="spin()">拉杆！</button>
+    <div id="result"></div>
+
+    <script>
+        const categories = {
+            map: ["封锁农场", "北山", "山谷", "电视台", "强封农场"],
+            weapon: ["M24", "AKM", "AUG"],
+            bullet: ["1级子弹", "2级子弹", "3级子弹", "4级子弹", "5级子弹"],
+            money: ["50万", "100万", "150万", "200万"],
+            task: [
+                "击杀真人1人", "击杀真人2人", "击杀真人3人",
+                "搜到金色子弹3次", "搜到金色子弹4次", "搜到金色子弹5次",
+                "打开保险箱3个", "打开保险箱4个", "打开保险箱5个",
+                "成功带出100万", "成功带出150万", "成功带出200万",
+                "带出88万且通过随机撤离点进行撤离",
+                "带出150万且通过随机撤离点进行撤离",
+                "累计击杀摸出金色品质物品5个", "累计击杀摸出金色品质物品6个", "累计击杀摸出金色品质物品7个",
+                "累计开启钥匙房3个", "累计开启钥匙房4个", "累计开启钥匙房5个",
+                "累计开启保险箱2个", "累计开启保险箱3个", "累计开启保险箱4个",
+                "完成局内随机事件任务"
+            ]
+        };
+        const weaponBulletLimits = {
+            "M24": ["1级子弹", "2级子弹", "3级子弹", "4级子弹"],
+            "AKM": ["1级子弹", "2级子弹", "3级子弹", "4级子弹", "5级子弹"],
+            "AUG": ["1级子弹", "2级子弹", "3级子弹", "4级子弹", "5级子弹"]
+        };
+
+        function spin() {
+            // 开始动画
+            document.querySelectorAll('.slot').forEach(slot => slot.classList.add('spinning'));
+            let iterations = 10;
+            let interval = setInterval(() => {
+                document.getElementById("map").innerText = categories.map[Math.floor(Math.random() * categories.map.length)];
+                document.getElementById("weapon").innerText = categories.weapon[Math.floor(Math.random() * categories.weapon.length)];
+                document.getElementById("bullet").innerText = categories.bullet[Math.floor(Math.random() * categories.bullet.length)];
+                document.getElementById("money").innerText = categories.money[Math.floor(Math.random() * categories.money.length)];
+                document.getElementById("task").innerText = categories.task[Math.floor(Math.random() * categories.task.length)];
+                iterations--;
+                if (iterations <= 0) {
+                    clearInterval(interval);
+                    document.querySelectorAll('.slot').forEach(slot => slot.classList.remove('spinning'));
+                    // 最终结果
+                    let result = {};
+                    for (let category in categories) {
+                        result[category] = categories[category][Math.floor(Math.random() * categories[category].length)];
+                    }
+                    if (weaponBulletLimits[result.weapon]) {
+                        result.bullet = weaponBulletLimits[result.weapon][Math.floor(Math.random() * weaponBulletLimits[result.weapon].length)];
+                    }
+                    document.getElementById("map").innerText = result.map;
+                    document.getElementById("weapon").innerText = result.weapon;
+                    document.getElementById("bullet").innerText = result.bullet;
+                    document.getElementById("money").innerText = result.money;
+                    document.getElementById("task").innerText = result.task;
+                    // 显示结果
+                    document.getElementById("result").innerText = Object.entries(result)
+                        .map(([k, v]) => `${k === 'map' ? '地图' : k === 'weapon' ? '武器' : k === 'bullet' ? '子弹' : k === 'money' ? '配装金额' : '任务'}: ${v}`)
+                        .join("\n");
+                    alert("拉杆成功！\n" + document.getElementById("result").innerText);
+                }
+            }, 100); // 每 100ms 刷新
+        }
+    </script>
+</body>
+</html>
